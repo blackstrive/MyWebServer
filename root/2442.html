@@ -1,0 +1,282 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>英语听力音频 | AWSL</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://cdn.jsdelivr.net/npm/font-awesome@4.7.0/css/font-awesome.min.css" rel="stylesheet">
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        primary: '#165DFF',
+                        secondary: '#36BFFA',
+                        accent: '#69B1FF',
+                        dark: '#1D2939',
+                        light: '#F9FAFB'
+                    },
+                    fontFamily: {
+                        inter: ['Inter', 'system-ui', 'sans-serif'],
+                    },
+                }
+            }
+        }
+    </script>
+    <style type="text/tailwindcss">
+        @layer utilities {
+            .content-auto {
+                content-visibility: auto;
+            }
+            .text-shadow {
+                text-shadow: 0 2px 4px rgba(0,0,0,0.1);
+            }
+            .bg-gradient-blue {
+                background: linear-gradient(135deg, #165DFF 0%, #36BFFA 100%);
+            }
+            .audio-visualizer {
+                height: 60px;
+                display: flex;
+                align-items: flex-end;
+                gap: 2px;
+                margin: 0 auto 20px;
+                max-width: 300px;
+            }
+            .audio-bar {
+                width: 4px;
+                background-color: #165DFF;
+                border-radius: 2px;
+                animation: equalize 1s infinite;
+            }
+            @keyframes equalize {
+                0%, 100% { height: calc(10% + var(--random) * 90%); }
+                50% { height: calc(40% + var(--random) * 60%); }
+            }
+        }
+    </style>
+</head>
+<body class="bg-gradient-to-br from-blue-50 to-indigo-100 min-h-screen flex flex-col font-inter">
+    <!-- 导航栏 -->
+    <nav class="bg-white shadow-md sticky top-0 z-50 transition-all duration-300" id="navbar">
+        <div class="container mx-auto px-4 py-3 flex justify-between items-center">
+            <div class="flex items-center space-x-2">
+                <div class="text-primary text-2xl font-bold">AWSL</div>
+                <span class="text-gray-500 text-sm hidden md:inline">英语听力资源</span>
+            </div>
+            <div class="flex items-center space-x-4">
+                <a href="#" class="text-gray-600 hover:text-primary transition-colors duration-200 hidden md:block">
+                    <i class="fa fa-home mr-1"></i> 首页
+                </a>
+                <a href="#" class="text-gray-600 hover:text-primary transition-colors duration-200 hidden md:block">
+                    <i class="fa fa-list mr-1"></i> 听力列表
+                </a>
+                <a href="#" class="text-gray-600 hover:text-primary transition-colors duration-200 hidden md:block">
+                    <i class="fa fa-question-circle mr-1"></i> 帮助
+                </a>
+                <button id="themeToggle" class="p-2 rounded-full hover:bg-gray-100 transition-colors duration-200" title="切换主题">
+                    <i class="fa fa-moon-o text-gray-600"></i>
+                </button>
+            </div>
+        </div>
+    </nav>
+
+    <!-- 主内容区 -->
+    <main class="flex-grow container mx-auto px-4 py-8">
+        <div class="max-w-3xl mx-auto bg-white rounded-2xl shadow-xl overflow-hidden transition-all duration-300 hover:shadow-2xl">
+            <!-- 音频标题区 -->
+            <div class="bg-gradient-blue text-white p-6 md:p-8">
+                <h1 class="text-2xl md:text-3xl font-bold mb-2 text-shadow">2024年英语四六级听力真题</h1>
+                <p class="text-white/90">听力原文及音频，含慢速和标准语速版本</p>
+                
+                <!-- 音频可视化 -->
+                <div class="audio-visualizer mt-6" id="audioVisualizer">
+                    <!-- 音频条由JS动态生成 -->
+                </div>
+            </div>
+            
+            <!-- 音频控制区 -->
+            <div class="p-6">
+                <!-- 加载提示 -->
+                <div id="loadingMessage" class="text-center text-gray-500 mb-6">
+                    <div class="inline-block animate-spin rounded-full h-5 w-5 border-b-2 border-primary mr-2"></div>
+                    正在加载音频，请稍候...
+                </div>
+                
+                <!-- 音频播放器 -->
+                <div id="audioPlayer" class="hidden">
+                    <audio id="audio" controls class="w-full h-12 focus:outline-none">
+                        <source src="./cet/24/4/listen/2442.mp3" type="audio/mpeg">
+                        您的浏览器不支持音频播放。
+                    </audio>
+                    
+                    <!-- 播放控制按钮 -->
+                    <div class="flex justify-center space-x-6 mt-6">
+                        <button id="prevBtn" class="p-3 rounded-full bg-gray-100 hover:bg-gray-200 transition-colors duration-200" title="上一个">
+                            <i class="fa fa-step-backward text-gray-700"></i>
+                        </button>
+                        <button id="playPauseBtn" class="p-4 rounded-full bg-primary hover:bg-primary/90 text-white shadow-lg transition-all duration-200 transform hover:scale-105" title="播放/暂停">
+                            <i class="fa fa-play text-xl"></i>
+                        </button>
+                        <button id="nextBtn" class="p-3 rounded-full bg-gray-100 hover:bg-gray-200 transition-colors duration-200" title="下一个">
+                            <i class="fa fa-step-forward text-gray-700"></i>
+                        </button>
+                    </div>
+                    
+                    <!-- 播放速度控制 -->
+                    <div class="flex items-center justify-center space-x-4 mt-6">
+                        <span class="text-gray-600">播放速度:</span>
+                        <div class="flex space-x-2">
+                            <button class="speed-btn px-3 py-1 rounded-md bg-gray-100 hover:bg-gray-200 transition-colors duration-200 text-sm" data-speed="0.75">0.75x</button>
+                            <button class="speed-btn px-3 py-1 rounded-md bg-primary text-white text-sm" data-speed="1">1.0x</button>
+                            <button class="speed-btn px-3 py-1 rounded-md bg-gray-100 hover:bg-gray-200 transition-colors duration-200 text-sm" data-speed="1.25">1.25x</button>
+                            <button class="speed-btn px-3 py-1 rounded-md bg-gray-100 hover:bg-gray-200 transition-colors duration-200 text-sm" data-speed="1.5">1.5x</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+
+        </div>
+        
+
+    </main>
+
+    <!-- 页脚 -->
+    <footer class="bg-dark text-white py-8 mt-12">
+        <div class="container mx-auto px-4">
+            <div class="flex flex-col md:flex-row justify-between items-center">
+                <div class="mb-4 md:mb-0">
+                    <div class="text-xl font-bold mb-2">AWSL</div>
+                    <p class="text-gray-400 text-sm">提供优质的英语学习资源，助力语言能力提升</p>
+                </div>
+                <div class="flex space-x-4">
+                    <a href="#" class="text-gray-400 hover:text-white transition-colors duration-200">
+                        <i class="fa fa-weixin text-xl"></i>
+                    </a>
+                    <a href="#" class="text-gray-400 hover:text-white transition-colors duration-200">
+                        <i class="fa fa-weibo text-xl"></i>
+                    </a>
+                    <a href="#" class="text-gray-400 hover:text-white transition-colors duration-200">
+                        <i class="fa fa-github text-xl"></i>
+                    </a>
+                </div>
+            </div>
+            <div class="mt-6 pt-6 border-t border-gray-700 text-center text-gray-500 text-sm">
+                <p>© 2024 AWSL 版权所有 | 英语听力资源平台</p>
+            </div>
+        </div>
+    </footer>
+
+    <script>
+        // 生成音频可视化条
+        const visualizer = document.getElementById('audioVisualizer');
+        for (let i = 0; i < 30; i++) {
+            const bar = document.createElement('div');
+            bar.className = 'audio-bar';
+            bar.style.setProperty('--random', Math.random());
+            bar.style.animationDelay = `${i * 0.05}s`;
+            visualizer.appendChild(bar);
+        }
+
+        // 音频元素和控制按钮
+        const audio = document.getElementById('audio');
+        const playPauseBtn = document.getElementById('playPauseBtn');
+        const prevBtn = document.getElementById('prevBtn');
+        const nextBtn = document.getElementById('nextBtn');
+        const loadingMessage = document.getElementById('loadingMessage');
+        const audioPlayer = document.getElementById('audioPlayer');
+        const speedBtns = document.querySelectorAll('.speed-btn');
+        
+        // 音频加载完成后显示播放器
+        audio.addEventListener('loadeddata', function() {
+            loadingMessage.classList.add('hidden');
+            audioPlayer.classList.remove('hidden');
+        });
+        
+        // 音频错误处理
+        audio.addEventListener('error', function() {
+            loadingMessage.innerHTML = '<i class="fa fa-exclamation-triangle text-red-500 mr-2"></i> 音频加载失败，请检查文件路径是否正确';
+            loadingMessage.classList.add('text-red-500');
+        });
+        
+        // 播放/暂停按钮
+        playPauseBtn.addEventListener('click', function() {
+            if (audio.paused) {
+                audio.play();
+                playPauseBtn.innerHTML = '<i class="fa fa-pause text-xl"></i>';
+                playPauseBtn.title = '暂停';
+            } else {
+                audio.pause();
+                playPauseBtn.innerHTML = '<i class="fa fa-play text-xl"></i>';
+                playPauseBtn.title = '播放';
+            }
+        });
+        
+        // 播放结束后重置按钮
+        audio.addEventListener('ended', function() {
+            playPauseBtn.innerHTML = '<i class="fa fa-play text-xl"></i>';
+            playPauseBtn.title = '播放';
+        });
+        
+        // 播放速度控制
+        speedBtns.forEach(btn => {
+            btn.addEventListener('click', function() {
+                const speed = parseFloat(this.getAttribute('data-speed'));
+                audio.playbackRate = speed;
+                
+                // 更新按钮样式
+                speedBtns.forEach(b => {
+                    b.classList.remove('bg-primary', 'text-white');
+                    b.classList.add('bg-gray-100', 'hover:bg-gray-200');
+                });
+                this.classList.remove('bg-gray-100', 'hover:bg-gray-200');
+                this.classList.add('bg-primary', 'text-white');
+            });
+        });
+        
+        // 模拟加载听力原文（实际应用中可通过AJAX获取）
+        setTimeout(() => {
+            document.getElementById('transcript').innerHTML = `
+                <p><strong>听力原文 - 短对话</strong></p>
+                <p>1. M: I'm worried about Jenny. She's really been depressed lately. She's always staying at home alone and not talking to anyone.</p>
+                <p>W: That's not like her. Maybe we could take her to the amusement park this weekend. Sometimes getting out can cheer people up.</p>
+                <p>Q: What does the woman suggest they do?</p>
+                <p><br></p>
+                <p><strong>听力原文 - 长对话</strong></p>
+                <p>W: Hello, this is the Customer Service Department. How can I assist you?</p>
+                <p>M: Hi, I received my order three days ago, but when I opened the package, I found that the product was damaged.</p>
+                <p>W: I'm sorry to hear that. Could you please provide me with your order number?</p>
+                <p>...</p>
+            `;
+        }, 2000);
+        
+        // 导航栏滚动效果
+        window.addEventListener('scroll', function() {
+            const navbar = document.getElementById('navbar');
+            if (window.scrollY > 50) {
+                navbar.classList.add('py-2', 'shadow-lg');
+                navbar.classList.remove('py-3', 'shadow-md');
+            } else {
+                navbar.classList.remove('py-2', 'shadow-lg');
+                navbar.classList.add('py-3', 'shadow-md');
+            }
+        });
+        
+        // 主题切换（示例功能）
+        const themeToggle = document.getElementById('themeToggle');
+        themeToggle.addEventListener('click', function() {
+            document.body.classList.toggle('dark-theme');
+            const icon = this.querySelector('i');
+            if (icon.classList.contains('fa-moon-o')) {
+                icon.classList.remove('fa-moon-o');
+                icon.classList.add('fa-sun-o');
+            } else {
+                icon.classList.remove('fa-sun-o');
+                icon.classList.add('fa-moon-o');
+            }
+        });
+    </script>
+</body>
+</html>
+    

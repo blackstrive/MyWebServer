@@ -1,0 +1,304 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AWSL - PDF文档预览</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://cdn.jsdelivr.net/npm/font-awesome@4.7.0/css/font-awesome.min.css" rel="stylesheet">
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        primary: '#165DFF',
+                        secondary: '#36BFFA',
+                        accent: '#69B1FF',
+                        dark: '#1D2939',
+                        light: '#F9FAFB'
+                    },
+                    fontFamily: {
+                        inter: ['Inter', 'system-ui', 'sans-serif'],
+                    },
+                }
+            }
+        }
+    </script>
+    <style type="text/tailwindcss">
+        @layer utilities {
+            .content-auto {
+                content-visibility: auto;
+            }
+            .text-shadow {
+                text-shadow: 0 2px 4px rgba(0,0,0,0.1);
+            }
+            .bg-gradient-blue {
+                background: linear-gradient(135deg, #165DFF 0%, #36BFFA 100%);
+            }
+            .animate-float {
+                animation: float 6s ease-in-out infinite;
+            }
+            @keyframes float {
+                0% { transform: translateY(0px); }
+                50% { transform: translateY(-10px); }
+                100% { transform: translateY(0px); }
+            }
+        }
+    </style>
+</head>
+<body class="bg-light font-inter min-h-screen flex flex-col">
+    <!-- 导航栏 -->
+    <nav class="bg-white shadow-md sticky top-0 z-50 transition-all duration-300" id="navbar">
+        <div class="container mx-auto px-4 py-3 flex justify-between items-center">
+            <div class="flex items-center space-x-2">
+                <div class="text-primary text-2xl font-bold">AWSL</div>
+                <span class="text-gray-500 text-sm hidden md:inline">文档预览平台</span>
+            </div>
+            <div class="flex items-center space-x-4">
+                <button id="zoomInBtn" class="p-2 rounded-full hover:bg-gray-100 transition-colors duration-200" title="放大">
+                    <i class="fa fa-search-plus text-gray-600"></i>
+                </button>
+                <button id="zoomOutBtn" class="p-2 rounded-full hover:bg-gray-100 transition-colors duration-200" title="缩小">
+                    <i class="fa fa-search-minus text-gray-600"></i>
+                </button>
+                <button id="fullscreenBtn" class="p-2 rounded-full hover:bg-gray-100 transition-colors duration-200" title="全屏">
+                    <i class="fa fa-expand text-gray-600"></i>
+                </button>
+                <a href="./cet/24/4/ans/2441.pdf" download class="flex items-center space-x-1 px-3 py-1.5 bg-primary text-white rounded-lg hover:bg-primary/90 transition-colors duration-200">
+                    <i class="fa fa-download"></i>
+                    <span class="hidden md:inline">下载文档</span>
+                </a>
+            </div>
+        </div>
+    </nav>
+
+    <!-- 头部区域 -->
+    <header class="bg-gradient-blue text-white py-12 md:py-16">
+        <div class="container mx-auto px-4 text-center">
+            <h1 class="text-[clamp(1.8rem,5vw,3rem)] font-bold mb-4 text-shadow">2024年四六级备考资料</h1>
+            <p class="text-lg md:text-xl opacity-90 max-w-3xl mx-auto">
+                权威真题解析，助力英语能力提升，轻松应对四六级考试
+            </p>
+        </div>
+    </header>
+
+    <!-- 主内容区 -->
+    <main class="flex-grow container mx-auto px-4 py-8">
+        <div class="bg-white rounded-xl shadow-lg overflow-hidden transition-all duration-300 hover:shadow-xl">
+            <!-- PDF预览控制栏 -->
+            <div class="bg-gray-50 border-b border-gray-200 px-4 py-3 flex justify-between items-center">
+                <div class="flex items-center space-x-3">
+                    <button id="prevPageBtn" class="p-2 rounded hover:bg-gray-100 transition-colors duration-200" title="上一页">
+                        <i class="fa fa-arrow-left text-gray-600"></i>
+                    </button>
+                    <div class="text-sm text-gray-700">
+                        <span id="currentPage">1</span> / <span id="totalPages">未知</span>
+                    </div>
+                    <button id="nextPageBtn" class="p-2 rounded hover:bg-gray-100 transition-colors duration-200" title="下一页">
+                        <i class="fa fa-arrow-right text-gray-600"></i>
+                    </button>
+                </div>
+                <div class="flex items-center space-x-2">
+                    <span class="text-sm text-gray-700">缩放:</span>
+                    <select id="zoomSelect" class="bg-white border border-gray-300 rounded-md px-2 py-1 text-sm focus:outline-none focus:ring-2 focus:ring-primary/50">
+                        <option value="0.5">50%</option>
+                        <option value="0.75">75%</option>
+                        <option value="1" selected>100%</option>
+                        <option value="1.25">125%</option>
+                        <option value="1.5">150%</option>
+                        <option value="2">200%</option>
+                        <option value="auto">自动</option>
+                        <option value="page-fit">适应页面</option>
+                    </select>
+                </div>
+            </div>
+            
+            <!-- PDF预览区域 -->
+            <div class="relative w-full h-[75vh] bg-gray-100" id="pdfContainer">
+                <iframe src="./cet/24/4/ans/2441.pdf" title="四六级备考资料" class="w-full h-full border-none transition-opacity duration-300" id="pdfFrame"></iframe>
+                
+                <!-- 加载状态 -->
+                <div id="loadingIndicator" class="absolute inset-0 flex items-center justify-center bg-white/80 z-10">
+                    <div class="text-center">
+                        <div class="w-16 h-16 border-4 border-primary/30 border-t-primary rounded-full animate-spin mx-auto mb-4"></div>
+                        <p class="text-gray-600">正在加载文档...</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <!-- 备考指南 -->
+        <div class="mt-12 bg-blue-50 rounded-xl p-6 border-l-4 border-primary">
+            <h3 class="text-lg font-semibold text-gray-800 mb-3 flex items-center">
+                <i class="fa fa-lightbulb-o text-primary mr-2"></i> 备考小贴士
+            </h3>
+            <ul class="list-disc list-inside text-gray-700 space-y-2">
+                <li>建议结合PDF文档中的真题进行模拟测试，熟悉考试形式和题型</li>
+                <li>听力部分可先浏览题目，预测听力内容，提高答题准确率</li>
+                <li>写作部分注意结构清晰，语言简洁，可适当使用连接词和高级词汇</li>
+                <li>考试前保持良好的作息，调整心态，以最佳状态迎接考试</li>
+            </ul>
+        </div>
+    </main>
+
+    <!-- 页脚 -->
+    <footer class="bg-dark text-white py-8 mt-12">
+        <div class="container mx-auto px-4">
+            <div class="flex flex-col md:flex-row justify-between items-center">
+                <div class="mb-4 md:mb-0">
+                    <div class="text-xl font-bold mb-2">AWSL</div>
+                    <p class="text-gray-400 text-sm">提供优质的四六级备考资源，助力考试成功</p>
+                </div>
+                <div class="flex space-x-4">
+                    <a href="#" class="text-gray-400 hover:text-white transition-colors duration-200">
+                        <i class="fa fa-weixin text-xl"></i>
+                    </a>
+                    <a href="#" class="text-gray-400 hover:text-white transition-colors duration-200">
+                        <i class="fa fa-weibo text-xl"></i>
+                    </a>
+                    <a href="#" class="text-gray-400 hover:text-white transition-colors duration-200">
+                        <i class="fa fa-github text-xl"></i>
+                    </a>
+                </div>
+            </div>
+            <div class="mt-6 pt-6 border-t border-gray-700 text-center text-gray-500 text-sm">
+                <p>© 2024 AWSL 版权所有 | 四六级备考资源平台</p>
+            </div>
+        </div>
+    </footer>
+
+    <script>
+        // 导航栏滚动效果
+        window.addEventListener('scroll', function() {
+            const navbar = document.getElementById('navbar');
+            if (window.scrollY > 50) {
+                navbar.classList.add('py-2', 'shadow-lg');
+                navbar.classList.remove('py-3', 'shadow-md');
+            } else {
+                navbar.classList.remove('py-2', 'shadow-lg');
+                navbar.classList.add('py-3', 'shadow-md');
+            }
+        });
+
+        // PDF加载完成后隐藏加载指示器
+        const pdfFrame = document.getElementById('pdfFrame');
+        const loadingIndicator = document.getElementById('loadingIndicator');
+        
+        pdfFrame.onload = function() {
+            setTimeout(() => {
+                loadingIndicator.style.opacity = '0';
+                setTimeout(() => {
+                    loadingIndicator.style.display = 'none';
+                }, 300);
+            }, 500);
+            
+            // 尝试获取PDF页数（需要PDF.js支持，此处为示例逻辑）
+            try {
+                if (pdfFrame.contentWindow.PDFViewerApplication) {
+                    pdfFrame.contentWindow.PDFViewerApplication.initialized.then(() => {
+                        const totalPages = pdfFrame.contentWindow.PDFViewerApplication.pagesCount;
+                        document.getElementById('totalPages').textContent = totalPages;
+                    });
+                }
+            } catch (e) {
+                console.log('无法获取PDF页数');
+            }
+        };
+
+        // 缩放控制
+        const zoomSelect = document.getElementById('zoomSelect');
+        const zoomInBtn = document.getElementById('zoomInBtn');
+        const zoomOutBtn = document.getElementById('zoomOutBtn');
+        
+        zoomSelect.addEventListener('change', function() {
+            const zoom = this.value;
+            if (pdfFrame.contentWindow.PDFViewerApplication) {
+                pdfFrame.contentWindow.PDFViewerApplication.pdfViewer.currentScaleValue = zoom;
+            }
+        });
+        
+        zoomInBtn.addEventListener('click', function() {
+            if (pdfFrame.contentWindow.PDFViewerApplication) {
+                pdfFrame.contentWindow.PDFViewerApplication.pdfViewer.currentScale += 0.1;
+                zoomSelect.value = pdfFrame.contentWindow.PDFViewerApplication.pdfViewer.currentScale;
+            }
+        });
+        
+        zoomOutBtn.addEventListener('click', function() {
+            if (pdfFrame.contentWindow.PDFViewerApplication) {
+                pdfFrame.contentWindow.PDFViewerApplication.pdfViewer.currentScale -= 0.1;
+                zoomSelect.value = pdfFrame.contentWindow.PDFViewerApplication.pdfViewer.currentScale;
+            }
+        });
+
+        // 页码控制
+        const prevPageBtn = document.getElementById('prevPageBtn');
+        const nextPageBtn = document.getElementById('nextPageBtn');
+        const currentPageEl = document.getElementById('currentPage');
+        
+        prevPageBtn.addEventListener('click', function() {
+            if (pdfFrame.contentWindow.PDFViewerApplication) {
+                if (pdfFrame.contentWindow.PDFViewerApplication.page > 1) {
+                    pdfFrame.contentWindow.PDFViewerApplication.page--;
+                    currentPageEl.textContent = pdfFrame.contentWindow.PDFViewerApplication.page;
+                }
+            }
+        });
+        
+        nextPageBtn.addEventListener('click', function() {
+            if (pdfFrame.contentWindow.PDFViewerApplication) {
+                if (pdfFrame.contentWindow.PDFViewerApplication.page < pdfFrame.contentWindow.PDFViewerApplication.pagesCount) {
+                    pdfFrame.contentWindow.PDFViewerApplication.page++;
+                    currentPageEl.textContent = pdfFrame.contentWindow.PDFViewerApplication.page;
+                }
+            }
+        });
+
+        // 全屏控制
+        const fullscreenBtn = document.getElementById('fullscreenBtn');
+        
+        fullscreenBtn.addEventListener('click', function() {
+            const pdfContainer = document.getElementById('pdfContainer');
+            
+            if (!document.fullscreenElement) {
+                if (pdfContainer.requestFullscreen) {
+                    pdfContainer.requestFullscreen();
+                } else if (pdfContainer.webkitRequestFullscreen) { /* Safari */
+                    pdfContainer.webkitRequestFullscreen();
+                } else if (pdfContainer.msRequestFullscreen) { /* IE11 */
+                    pdfContainer.msRequestFullscreen();
+                }
+                fullscreenBtn.innerHTML = '<i class="fa fa-compress text-gray-600"></i>';
+                fullscreenBtn.title = '退出全屏';
+            } else {
+                if (document.exitFullscreen) {
+                    document.exitFullscreen();
+                } else if (document.webkitExitFullscreen) { /* Safari */
+                    document.webkitExitFullscreen();
+                } else if (document.msExitFullscreen) { /* IE11 */
+                    document.msExitFullscreen();
+                }
+                fullscreenBtn.innerHTML = '<i class="fa fa-expand text-gray-600"></i>';
+                fullscreenBtn.title = '全屏';
+            }
+        });
+
+        // 监听全屏状态变化
+        document.addEventListener('fullscreenchange', updateFullscreenButton);
+        document.addEventListener('webkitfullscreenchange', updateFullscreenButton);
+        document.addEventListener('mozfullscreenchange', updateFullscreenButton);
+        document.addEventListener('MSFullscreenChange', updateFullscreenButton);
+        
+        function updateFullscreenButton() {
+            if (document.fullscreenElement) {
+                fullscreenBtn.innerHTML = '<i class="fa fa-compress text-gray-600"></i>';
+                fullscreenBtn.title = '退出全屏';
+            } else {
+                fullscreenBtn.innerHTML = '<i class="fa fa-expand text-gray-600"></i>';
+                fullscreenBtn.title = '全屏';
+            }
+        }
+    </script>
+</body>
+</html>
+    

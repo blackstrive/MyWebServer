@@ -1,0 +1,495 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>用户注册 - 加入我们</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+        
+        body {
+            background: linear-gradient(135deg, #1a2980 0%, #26d0ce 100%);
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            padding: 20px;
+            color: #333;
+        }
+        
+        .container {
+            width: 100%;
+            max-width: 1000px;
+            display: flex;
+            background: rgba(255, 255, 255, 0.95);
+            border-radius: 20px;
+            overflow: hidden;
+            box-shadow: 0 15px 40px rgba(0, 0, 0, 0.25);
+        }
+        
+        .left-section {
+            flex: 1;
+            background: linear-gradient(to right, #4b6cb7, #182848);
+            color: white;
+            padding: 50px;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .left-section::before {
+            content: "";
+            position: absolute;
+            top: -100px;
+            right: -100px;
+            width: 300px;
+            height: 300px;
+            border-radius: 50%;
+            background: rgba(255, 255, 255, 0.05);
+        }
+        
+        .left-section::after {
+            content: "";
+            position: absolute;
+            bottom: -100px;
+            left: -100px;
+            width: 250px;
+            height: 250px;
+            border-radius: 50%;
+            background: rgba(255, 255, 255, 0.08);
+        }
+        
+        .welcome-content {
+            position: relative;
+            z-index: 2;
+        }
+        
+        .welcome-content h1 {
+            font-size: 2.8rem;
+            margin-bottom: 20px;
+            font-weight: 700;
+        }
+        
+        .welcome-content p {
+            font-size: 1.2rem;
+            line-height: 1.8;
+            margin-bottom: 30px;
+            opacity: 0.9;
+            max-width: 500px;
+        }
+        
+        .features {
+            list-style: none;
+            margin-top: 40px;
+        }
+        
+        .features li {
+            margin: 20px 0;
+            display: flex;
+            align-items: center;
+            gap: 15px;
+        }
+        
+        .features i {
+            font-size: 1.8rem;
+            color: #4db8ff;
+            width: 50px;
+            height: 50px;
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        
+        .feature-text h3 {
+            font-size: 1.4rem;
+            margin-bottom: 5px;
+        }
+        
+        .feature-text p {
+            font-size: 1rem;
+            opacity: 0.8;
+            margin: 0;
+        }
+        
+        .right-section {
+            flex: 1;
+            padding: 60px 50px;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+        }
+        
+        .logo {
+            text-align: center;
+            margin-bottom: 30px;
+        }
+        
+        .logo i {
+            font-size: 3.5rem;
+            color: #2979ff;
+            margin-bottom: 15px;
+        }
+        
+        .logo h2 {
+            font-size: 2.5rem;
+            color: #1565c0;
+            margin-bottom: 10px;
+        }
+        
+        .logo p {
+            font-size: 1.1rem;
+            color: #546e7a;
+        }
+        
+        .form-container {
+            max-width: 450px;
+            margin: 0 auto;
+            width: 100%;
+        }
+        
+        .form-header {
+            text-align: center;
+            margin-bottom: 35px;
+        }
+        
+        .form-header h3 {
+            font-size: 2.2rem;
+            color: #0d47a1;
+            margin-bottom: 10px;
+            position: relative;
+            display: inline-block;
+        }
+        
+        .form-header h3::after {
+            content: "";
+            position: absolute;
+            bottom: -10px;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 80px;
+            height: 4px;
+            background: linear-gradient(to right, #2979ff, #01579b);
+            border-radius: 2px;
+        }
+        
+        .form-header p {
+            font-size: 1.1rem;
+            color: #546e7a;
+            margin-top: 20px;
+        }
+        
+        .form-group {
+            margin-bottom: 25px;
+            position: relative;
+        }
+        
+        .form-group i {
+            position: absolute;
+            left: 15px;
+            top: 50%;
+            transform: translateY(-50%);
+            color: #2979ff;
+            font-size: 1.2rem;
+        }
+        
+        .form-control {
+            width: 100%;
+            padding: 16px 20px 16px 50px;
+            border: 2px solid #e0e0e0;
+            border-radius: 12px;
+            font-size: 1.1rem;
+            transition: all 0.3s;
+            outline: none;
+        }
+        
+        .form-control:focus {
+            border-color: #2979ff;
+            box-shadow: 0 0 0 3px rgba(41, 121, 255, 0.2);
+        }
+        
+        .password-container {
+            position: relative;
+        }
+        
+        .toggle-password {
+            position: absolute;
+            right: 15px;
+            top: 50%;
+            transform: translateY(-50%);
+            background: none;
+            border: none;
+            color: #757575;
+            cursor: pointer;
+            font-size: 1.2rem;
+        }
+        
+        .terms {
+            display: flex;
+            align-items: flex-start;
+            gap: 10px;
+            margin: 20px 0;
+        }
+        
+        .terms input {
+            margin-top: 5px;
+        }
+        
+        .terms label {
+            font-size: 1rem;
+            color: #546e7a;
+            line-height: 1.5;
+        }
+        
+        .terms a {
+            color: #2979ff;
+            text-decoration: none;
+        }
+        
+        .terms a:hover {
+            text-decoration: underline;
+        }
+        
+        .submit-btn {
+            width: 100%;
+            padding: 18px;
+            background: linear-gradient(to right, #2979ff, #01579b);
+            color: white;
+            border: none;
+            border-radius: 12px;
+            font-size: 1.2rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
+            box-shadow: 0 6px 15px rgba(41, 121, 255, 0.4);
+        }
+        
+        .submit-btn:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 8px 20px rgba(41, 121, 255, 0.5);
+        }
+        
+        .submit-btn:active {
+            transform: translateY(0);
+        }
+        
+        .login-link {
+            text-align: center;
+            margin-top: 25px;
+            font-size: 1.1rem;
+            color: #546e7a;
+        }
+        
+        .login-link a {
+            color: #2979ff;
+            text-decoration: none;
+            font-weight: 600;
+        }
+        
+        .login-link a:hover {
+            text-decoration: underline;
+        }
+        
+        .social-login {
+            margin-top: 30px;
+            text-align: center;
+        }
+        
+        .social-login p {
+            position: relative;
+            color: #757575;
+            margin-bottom: 20px;
+        }
+        
+        .social-login p::before,
+        .social-login p::after {
+            content: "";
+            position: absolute;
+            top: 50%;
+            width: 30%;
+            height: 1px;
+            background: #e0e0e0;
+        }
+        
+        .social-login p::before {
+            left: 0;
+        }
+        
+        .social-login p::after {
+            right: 0;
+        }
+        
+        .social-icons {
+            display: flex;
+            justify-content: center;
+            gap: 20px;
+        }
+        
+        .social-icon {
+            width: 50px;
+            height: 50px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-size: 1.4rem;
+            transition: all 0.3s;
+        }
+        
+        .social-icon:hover {
+            transform: translateY(-5px);
+        }
+        
+        .facebook {
+            background: #3b5998;
+        }
+        
+        .google {
+            background: #dd4b39;
+        }
+        
+        .twitter {
+            background: #1da1f2;
+        }
+        
+        .github {
+            background: #333;
+        }
+        
+        /* 响应式设计 */
+        @media (max-width: 900px) {
+            .container {
+                flex-direction: column;
+            }
+            
+            .left-section {
+                padding: 40px 30px;
+            }
+            
+            .welcome-content h1 {
+                font-size: 2.3rem;
+            }
+            
+            .features li {
+                margin: 15px 0;
+            }
+        }
+        
+        @media (max-width: 500px) {
+            .right-section {
+                padding: 40px 25px;
+            }
+            
+            .form-header h3 {
+                font-size: 1.8rem;
+            }
+            
+            .logo h2 {
+                font-size: 2rem;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <!-- 左侧欢迎区域 -->
+        <div class="left-section">
+            <div class="welcome-content">
+                <h1>加入我们的社区</h1>
+                <p>注册账号，解锁更多功能，享受个性化服务。成为我们大家庭的一员，开启全新体验！</p>
+                
+                <ul class="features">
+                    <li>
+                        <i class="fas fa-rocket"></i>
+                        <div class="feature-text">
+                            <h3>快速访问</h3>
+                            <p>一键登录所有服务，节省您的时间</p>
+                        </div>
+                    </li>
+                    <li>
+                        <i class="fas fa-lock"></i>
+                        <div class="feature-text">
+                            <h3>安全保障</h3>
+                            <p>银行级加密技术保护您的个人信息</p>
+                        </div>
+                    </li>
+                    <li>
+                        <i class="fas fa-gift"></i>
+                        <div class="feature-text">
+                            <h3>专属福利</h3>
+                            <p>新用户注册即可获得专属优惠礼包</p>
+                        </div>
+                    </li>
+                    <li>
+                        <i class="fas fa-sync-alt"></i>
+                        <div class="feature-text">
+                            <h3>多设备同步</h3>
+                            <p>在多个设备上同步您的数据和设置</p>
+                        </div>
+                    </li>
+                </ul>
+            </div>
+        </div>
+        
+        <!-- 右侧注册区域 -->
+        <div class="right-section">
+            <div class="logo">
+                <i class="fas fa-user-plus"></i>
+                <h2>用户注册</h2>
+                <p>创建您的个人账户</p>
+            </div>
+            
+            <div class="form-container">
+               
+                <form action="3CGISQL.cgi" method="post">
+                    <div class="form-group">
+                        <i class="fas fa-user"></i>
+                        <input type="text" name="user" class="form-control" placeholder="用户名" required="required">
+                    </div>                  
+                    <div class="form-group">
+                        <i class="fas fa-lock"></i>
+                        <div class="password-container">
+                            <input type="password" name="password" id="password" class="form-control" placeholder="用户密码" required="required">
+                            <button type="button" class="toggle-password" id="togglePassword">
+                                <i class="fas fa-eye"></i>
+                            </button>
+                        </div>
+                    </div>
+                                      
+                    <button type="submit" class="submit-btn">
+                        <i class="fas fa-user-plus"></i> 立即注册
+                    </button>
+                </form>
+            
+            </div>
+        </div>
+    </div>
+    
+    <script>
+        // 密码显示/隐藏功能
+        const togglePassword = document.querySelector('#togglePassword');
+        const password = document.querySelector('#password');
+        
+        togglePassword.addEventListener('click', function() {
+            const type = password.getAttribute('type') === 'password' ? 'text' : 'password';
+            password.setAttribute('type', type);
+            this.innerHTML = type === 'password' ? '<i class="fas fa-eye"></i>' : '<i class="fas fa-eye-slash"></i>';
+        });
+        
+    </script>
+</body>
+</html>

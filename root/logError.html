@@ -1,0 +1,469 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>登录失败 - 用户名或密码错误</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+        
+        body {
+            background: linear-gradient(135deg, #1a2a6c, #b21f1f, #1a2a6c);
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            padding: 20px;
+            position: relative;
+            overflow: hidden;
+        }
+        
+        /* 背景装饰元素 */
+        .decoration {
+            position: absolute;
+            border-radius: 50%;
+            background: rgba(255, 255, 255, 0.05);
+            z-index: 0;
+            animation: float 15s infinite linear;
+        }
+        
+        .circle-1 {
+            width: 300px;
+            height: 300px;
+            top: -100px;
+            left: -50px;
+        }
+        
+        .circle-2 {
+            width: 200px;
+            height: 200px;
+            bottom: -80px;
+            right: -60px;
+            animation-duration: 18s;
+            animation-direction: reverse;
+        }
+        
+        .circle-3 {
+            width: 150px;
+            height: 150px;
+            top: 30%;
+            right: 15%;
+            animation-duration: 12s;
+        }
+        
+        @keyframes float {
+            0% {
+                transform: translate(0, 0) rotate(0deg);
+            }
+            25% {
+                transform: translate(10px, 15px) rotate(90deg);
+            }
+            50% {
+                transform: translate(0, 20px) rotate(180deg);
+            }
+            75% {
+                transform: translate(-10px, 15px) rotate(270deg);
+            }
+            100% {
+                transform: translate(0, 0) rotate(360deg);
+            }
+        }
+        
+        .container {
+            background: rgba(255, 255, 255, 0.95);
+            border-radius: 20px;
+            box-shadow: 0 20px 50px rgba(0, 0, 0, 0.3);
+            width: 100%;
+            max-width: 500px;
+            overflow: hidden;
+            position: relative;
+            z-index: 10;
+            transform: translateY(0);
+            animation: fadeIn 0.6s ease-out;
+            overflow: hidden;
+        }
+        
+        @keyframes fadeIn {
+            from {
+                opacity: 0;
+                transform: translateY(20px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+        
+        .error-header {
+            background: linear-gradient(to right, #e53935, #e35d5b);
+            color: white;
+            padding: 40px 30px;
+            text-align: center;
+            position: relative;
+        }
+        
+        .error-icon {
+            width: 100px;
+            height: 100px;
+            background: rgba(255, 255, 255, 0.2);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin: 0 auto 25px;
+            animation: pulse 2s infinite;
+        }
+        
+        @keyframes pulse {
+            0% {
+                box-shadow: 0 0 0 0 rgba(255, 255, 255, 0.4);
+            }
+            70% {
+                box-shadow: 0 0 0 15px rgba(255, 255, 255, 0);
+            }
+            100% {
+                box-shadow: 0 0 0 0 rgba(255, 255, 255, 0);
+            }
+        }
+        
+        .error-icon i {
+            font-size: 50px;
+            color: white;
+        }
+        
+        .error-header h1 {
+            font-size: 2.5rem;
+            margin-bottom: 10px;
+            text-shadow: 0 2px 4px rgba(0,0,0,0.2);
+        }
+        
+        .error-header p {
+            font-size: 1.2rem;
+            opacity: 0.9;
+        }
+        
+        .error-message {
+            background: #fff5f5;
+            padding: 20px;
+            text-align: center;
+            border-bottom: 1px solid #ffd1d1;
+        }
+        
+        .error-message p {
+            font-size: 1.3rem;
+            color: #e53935;
+            font-weight: 600;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 12px;
+        }
+        
+        .error-message i {
+            font-size: 1.5rem;
+        }
+        
+        .login-form {
+            padding: 40px 30px 30px;
+        }
+        
+        .form-header {
+            text-align: center;
+            margin-bottom: 25px;
+        }
+        
+        .form-header h2 {
+            font-size: 1.8rem;
+            color: #2c3e50;
+            margin-bottom: 8px;
+            position: relative;
+            display: inline-block;
+        }
+        
+        .form-header h2::after {
+            content: "";
+            position: absolute;
+            bottom: -8px;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 60px;
+            height: 4px;
+            background: linear-gradient(to right, #3498db, #2980b9);
+            border-radius: 2px;
+        }
+        
+        .form-header p {
+            font-size: 1.1rem;
+            color: #7f8c8d;
+            margin-top: 15px;
+        }
+        
+        .form-group {
+            margin-bottom: 25px;
+            position: relative;
+        }
+        
+        .form-group i {
+            position: absolute;
+            left: 15px;
+            top: 50%;
+            transform: translateY(-50%);
+            color: #3498db;
+            font-size: 1.2rem;
+        }
+        
+        .form-control {
+            width: 100%;
+            padding: 16px 20px 16px 50px;
+            border: 2px solid #e0e6ed;
+            border-radius: 12px;
+            font-size: 1.1rem;
+            transition: all 0.3s;
+            outline: none;
+        }
+        
+        .form-control:focus {
+            border-color: #3498db;
+            box-shadow: 0 0 0 3px rgba(52, 152, 219, 0.2);
+        }
+        
+        .form-control.error {
+            border-color: #e53935;
+            background: #fffafa;
+        }
+        
+        .form-control.error:focus {
+            box-shadow: 0 0 0 3px rgba(229, 57, 53, 0.2);
+        }
+        
+        .password-container {
+            position: relative;
+        }
+        
+        .toggle-password {
+            position: absolute;
+            right: 15px;
+            top: 50%;
+            transform: translateY(-50%);
+            background: none;
+            border: none;
+            color: #7f8c8d;
+            cursor: pointer;
+            font-size: 1.2rem;
+        }
+        
+        .options {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin: 20px 0 30px;
+            font-size: 1rem;
+            color: #555;
+        }
+        
+        .remember {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+        
+        .remember input {
+            width: 18px;
+            height: 18px;
+        }
+        
+        .forgot-password {
+            color: #3498db;
+            text-decoration: none;
+            transition: all 0.3s;
+        }
+        
+        .forgot-password:hover {
+            text-decoration: underline;
+            color: #2980b9;
+        }
+        
+        .submit-btn {
+            width: 100%;
+            padding: 16px;
+            background: linear-gradient(to right, #3498db, #2980b9);
+            color: white;
+            border: none;
+            border-radius: 12px;
+            font-size: 1.2rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
+            box-shadow: 0 6px 15px rgba(52, 152, 219, 0.4);
+        }
+        
+        .submit-btn:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 8px 20px rgba(52, 152, 219, 0.5);
+        }
+        
+        .submit-btn:active {
+            transform: translateY(0);
+        }
+        
+        .signup-link {
+            text-align: center;
+            margin-top: 30px;
+            font-size: 1.1rem;
+            color: #555;
+        }
+        
+        .signup-link a {
+            color: #3498db;
+            text-decoration: none;
+            font-weight: 600;
+            transition: all 0.3s;
+        }
+        
+        .signup-link a:hover {
+            text-decoration: underline;
+        }
+        
+        .suggestions {
+            background: #f8f9fc;
+            border-radius: 12px;
+            padding: 25px;
+            margin-top: 30px;
+            border-left: 4px solid #3498db;
+        }
+        
+        .suggestions h3 {
+            color: #2c3e50;
+            margin-bottom: 15px;
+            font-size: 1.3rem;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        
+        .suggestions ul {
+            padding-left: 25px;
+        }
+        
+        .suggestions li {
+            margin: 12px 0;
+            color: #555;
+            line-height: 1.6;
+        }
+        
+        /* 响应式设计 */
+        @media (max-width: 600px) {
+            .container {
+                padding: 0;
+            }
+            
+            .error-header {
+                padding: 30px 20px;
+            }
+            
+            .error-icon {
+                width: 80px;
+                height: 80px;
+            }
+            
+            .error-icon i {
+                font-size: 40px;
+            }
+            
+            .error-header h1 {
+                font-size: 2rem;
+            }
+            
+            .login-form {
+                padding: 30px 25px;
+            }
+        }
+        
+        @media (max-width: 400px) {
+            .options {
+                flex-direction: column;
+                gap: 15px;
+                align-items: flex-start;
+            }
+            
+            .form-header h2 {
+                font-size: 1.6rem;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- 背景装饰元素 -->
+    <div class="decoration circle-1"></div>
+    <div class="decoration circle-2"></div>
+    <div class="decoration circle-3"></div>
+    
+    <div class="container">
+        <div class="error-header">
+            <div class="error-icon">
+                <i class="fas fa-exclamation-triangle"></i>
+            </div>
+            <h1>登录失败</h1>
+            <p>无法验证您的账户信息</p>
+        </div>
+        
+        <div class="error-message">
+            <p><i class="fas fa-exclamation-circle"></i> 提示：用户名或密码错误，请重试</p>
+        </div>
+        
+        <div class="login-form">
+            
+            <form action="2CGISQL.cgi" method="post">
+                <div class="form-group">
+                    <i class="fas fa-user"></i>
+                    <input type="text" name="user" class="form-control error" placeholder="用户名" required="required" autofocus>
+                </div>
+                
+                <div class="form-group">
+                    <i class="fas fa-lock"></i>
+                    <div class="password-container">
+                        <input type="password" name="password" id="password" class="form-control error" placeholder="登录密码" required="required">
+                        <button type="button" class="toggle-password" id="togglePassword">
+                            <i class="fas fa-eye"></i>
+                        </button>
+                    </div>
+                </div>
+                
+                <button type="submit" class="submit-btn">
+                    <i class="fas fa-sign-in-alt"></i> 重新登录
+                </button>
+            </form>
+            
+        </div>
+    </div>
+    
+    <script>
+        // 密码显示/隐藏功能
+        const togglePassword = document.querySelector('#togglePassword');
+        const password = document.querySelector('#password');
+        
+        togglePassword.addEventListener('click', function() {
+            const type = password.getAttribute('type') === 'password' ? 'text' : 'password';
+            password.setAttribute('type', type);
+            this.innerHTML = type === 'password' ? '<i class="fas fa-eye"></i>' : '<i class="fas fa-eye-slash"></i>';
+        });
+        
+        // 表单提交动画
+        const form = document.querySelector('form');
+        const submitBtn = document.querySelector('.submit-btn');
+        
+
+        document.querySelector('input[name="user"]').focus();
+    </script>
+</body>
+</html>

@@ -1,0 +1,491 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>大学英语四六级考试资源分享平台</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Microsoft YaHei', 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+        
+        body {
+            background: linear-gradient(135deg, #1a2980 0%, #26d0ce 100%);
+            min-height: 100vh;
+            color: #333;
+            overflow-x: hidden;
+        }
+        
+        /* 顶部导航栏 */
+        .top-nav {
+            background: linear-gradient(to right, #0f2027, #203a43, #2c5364);
+            color: white;
+            padding: 15px 5%;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+            position: sticky;
+            top: 0;
+            z-index: 1000;
+        }
+        
+        .logo {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+        }
+        
+        .logo i {
+            font-size: 2.2rem;
+            color: #4db8ff;
+        }
+        
+        .logo h1 {
+            font-size: 1.8rem;
+            font-weight: 700;
+        }
+        
+        .nav-links {
+            display: flex;
+            gap: 30px;
+        }
+        
+        .nav-links a {
+            color: #e0f7fa;
+            text-decoration: none;
+            font-size: 1.1rem;
+            font-weight: 500;
+            transition: all 0.3s;
+            padding: 8px 15px;
+            border-radius: 5px;
+        }
+        
+        .nav-links a:hover {
+            background: rgba(77, 184, 255, 0.2);
+            transform: translateY(-2px);
+        }
+        
+        .user-actions {
+            display: flex;
+            gap: 20px;
+            align-items: center;
+        }
+        
+        .search-box {
+            display: flex;
+            background: rgba(255, 255, 255, 0.15);
+            border-radius: 30px;
+            padding: 8px 15px;
+        }
+        
+        .search-box input {
+            background: transparent;
+            border: none;
+            color: white;
+            padding: 5px 10px;
+            width: 200px;
+            font-size: 1rem;
+        }
+        
+        .search-box input::placeholder {
+            color: rgba(255, 255, 255, 0.7);
+        }
+        
+        .search-box button {
+            background: transparent;
+            border: none;
+            color: white;
+            cursor: pointer;
+        }
+        
+        /* 主内容区 - 横屏布局 */
+        .main-content {
+            display: flex;
+            min-height: calc(100vh - 70px);
+            padding: 0;
+        }
+        
+        /* 左侧内容区 */
+        .content-section {
+            flex: 1;
+            padding: 40px 5%;
+            background: rgba(255, 255, 255, 0.95);
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+        }
+        
+        .welcome-section {
+            max-width: 100%;
+            margin: 0 auto;
+        }
+        
+        .welcome-heading {
+            font-size: 2.5rem;
+            color: #1565c0;
+            margin-bottom: 25px;
+            position: relative;
+            display: inline-block;
+        }
+        
+        .welcome-heading::after {
+            content: "";
+            position: absolute;
+            bottom: -10px;
+            left: 0;
+            width: 120px;
+            height: 5px;
+            background: linear-gradient(to right, #1565c0, #2196f3);
+            border-radius: 3px;
+        }
+        
+        .welcome-text {
+            font-size: 1.2rem;
+            margin: 0 0 40px;
+            line-height: 1.8;
+            color: #37474f;
+        }
+        
+        .features {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 25px;
+            margin-bottom: 50px;
+        }
+        
+        .feature-card {
+            background: white;
+            border-radius: 12px;
+            padding: 25px;
+            box-shadow: 0 6px 16px rgba(33, 150, 243, 0.15);
+            transition: all 0.3s ease;
+            border-left: 4px solid #2196f3;
+        }
+        
+        .feature-card:hover {
+            transform: translateY(-10px);
+            box-shadow: 0 12px 20px rgba(33, 150, 243, 0.2);
+        }
+        
+        .feature-card i {
+            font-size: 2.5rem;
+            color: #2196f3;
+            margin-bottom: 15px;
+        }
+        
+        .feature-card h3 {
+            font-size: 1.4rem;
+            color: #1565c0;
+            margin-bottom: 12px;
+        }
+        
+        .feature-card p {
+            color: #546e7a;
+            line-height: 1.6;
+        }
+        
+        .buttons-container {
+            display: flex;
+            justify-content: center;
+            gap: 40px;
+            margin: 40px 0;
+            flex-wrap: wrap;
+        }
+        
+        .form-container {
+            flex: 1;
+            min-width: 250px;
+        }
+        
+        .btn {
+            padding: 18px 45px;
+            font-size: 1.25rem;
+            border: none;
+            border-radius: 50px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            font-weight: 600;
+            width: 100%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 12px;
+            box-shadow: 0 6px 15px rgba(0,0,0,0.15);
+        }
+        
+        .btn-new {
+            background: linear-gradient(to right, #00c853, #009624);
+            color: white;
+        }
+        
+        .btn-existing {
+            background: linear-gradient(to right, #2979ff, #01579b);
+            color: white;
+        }
+        
+        .btn:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 10px 22px rgba(0,0,0,0.2);
+        }
+        
+        .btn:active {
+            transform: translateY(0);
+        }
+        
+        /* 页脚 */
+        footer {
+            background: linear-gradient(to right, #0f2027, #203a43);
+            color: white;
+            text-align: center;
+            padding: 30px 5%;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+        
+        .footer-content {
+            display: flex;
+            justify-content: space-between;
+            width: 100%;
+            max-width: 1200px;
+            margin-bottom: 30px;
+            flex-wrap: wrap;
+        }
+        
+        .footer-section {
+            flex: 1;
+            min-width: 250px;
+            padding: 20px;
+        }
+        
+        .footer-section h3 {
+            font-size: 1.4rem;
+            margin-bottom: 20px;
+            color: #4db8ff;
+            position: relative;
+            display: inline-block;
+        }
+        
+        .footer-section h3::after {
+            content: "";
+            position: absolute;
+            bottom: -8px;
+            left: 0;
+            width: 50px;
+            height: 3px;
+            background: #4db8ff;
+        }
+        
+        .footer-links {
+            list-style: none;
+        }
+        
+        .footer-links li {
+            margin: 15px 0;
+        }
+        
+        .footer-links a {
+            color: #e0f7fa;
+            text-decoration: none;
+            transition: all 0.3s;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        
+        .footer-links a:hover {
+            color: #4db8ff;
+            transform: translateX(5px);
+        }
+        
+        .copyright {
+            width: 100%;
+            padding-top: 20px;
+            border-top: 1px solid rgba(255, 255, 255, 0.1);
+            font-size: 1rem;
+            opacity: 0.8;
+        }
+        
+        /* 响应式设计 */
+        @media (max-width: 768px) {
+            .top-nav {
+                flex-direction: column;
+                gap: 20px;
+                padding: 15px;
+            }
+            
+            .nav-links {
+                flex-wrap: wrap;
+                justify-content: center;
+            }
+            
+            .user-actions {
+                width: 100%;
+                justify-content: center;
+            }
+            
+            .buttons-container {
+                flex-direction: column;
+                align-items: center;
+                gap: 25px;
+            }
+            
+            .footer-content {
+                flex-direction: column;
+                align-items: center;
+                text-align: center;
+            }
+            
+            .footer-section h3::after {
+                left: 50%;
+                transform: translateX(-50%);
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- 顶部导航栏 -->
+    <nav class="top-nav">
+        <div class="logo">
+            <i class="fas fa-book-open"></i>
+            <h1>大学英语四六级考试资源分享平台</h1>
+        </div>
+        
+        <div class="nav-links">
+            <a href="#"><i class="fas fa-home"></i> 首页</a>
+            <a href="#"><i class="fas fa-book"></i> 学习资料</a>
+            <a href="#"><i class="fas fa-headphones"></i> 听力训练</a>
+            <a href="#"><i class="fas fa-file-alt"></i> 真题模拟</a>
+            <a href="#"><i class="fas fa-chart-line"></i> 备考攻略</a>
+        </div>
+        
+        <div class="user-actions">
+            <div class="search-box">
+                <input type="text" placeholder="搜索学习资源...">
+                <button><i class="fas fa-search"></i></button>
+            </div>
+        </div>
+    </nav>
+    
+    <!-- 主内容区 - 优化为单栏布局 -->
+    <div class="main-content">
+        <!-- 左侧内容区（已扩展至全宽） -->
+        <section class="content-section">
+            <div class="welcome-section">
+                <h2 class="welcome-heading">欢迎访问CET4/CET6资源平台</h2>
+                <p class="welcome-text">
+                    我们提供最全面的大学英语四六级考试资源，包括历年真题、听力训练、高频词汇、写作模板和备考攻略。
+                    无论您是第一次参加考试的新考生，还是希望提高分数的老考生，我们都能为您提供最有效的学习支持。
+                </p>
+                
+                <div class="features">
+                    <div class="feature-card">
+                        <i class="fas fa-file-download"></i>
+                        <h3>历年真题下载</h3>
+                        <p>近10年四六级考试真题及答案解析，包含完整听力音频文件，帮助您熟悉考试题型和难度。</p>
+                    </div>
+                    
+                    <div class="feature-card">
+                        <i class="fas fa-headphones-alt"></i>
+                        <h3>听力强化训练</h3>
+                        <p>每日更新听力练习，包含短对话、长对话、短文理解和讲座等多种题型，提升听力应试能力。</p>
+                    </div>
+                    
+                    <div class="feature-card">
+                        <i class="fas fa-book"></i>
+                        <h3>核心词汇宝典</h3>
+                        <p>四六级高频词汇分类整理，搭配记忆技巧和真题例句，助您快速掌握核心词汇。</p>
+                    </div>
+                    
+                    <div class="feature-card">
+                        <i class="fas fa-pen-fancy"></i>
+                        <h3>写作高分模板</h3>
+                        <p>各类作文模板、万能句型和高分表达，提供范文解析和批改服务，轻松提升写作分数。</p>
+                    </div>
+                </div>
+                
+                <div class="buttons-container">
+                    <div class="form-container">
+                        <form action="0" method="post">
+                            <button type="submit" class="btn btn-new">
+                                <i class="fas fa-user-plus"></i> 新用户注册
+                            </button>
+                        </form>
+                    </div>
+                    
+                    <div class="form-container">
+                        <form action="1" method="post">
+                            <button type="submit" class="btn btn-existing">
+                                <i class="fas fa-sign-in-alt"></i> 已有账号登录
+                            </button>
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </section>
+    </div>
+    
+    <!-- 页脚 -->
+    <footer>
+        <div class="footer-content">
+            <div class="footer-section">
+                <h3>关于我们</h3>
+                <p>致力于为大学生提供最优质的四六级备考资源，帮助考生高效备考，轻松通过考试。</p>
+            </div>
+            
+            <div class="footer-section">
+                <h3>快速链接</h3>
+                <ul class="footer-links">
+                    <li><a href="#"><i class="fas fa-chevron-right"></i> 最新考试资讯</a></li>
+                    <li><a href="#"><i class="fas fa-chevron-right"></i> 备考计划表</a></li>
+                    <li><a href="#"><i class="fas fa-chevron-right"></i> 高分学员经验</a></li>
+                    <li><a href="#"><i class="fas fa-chevron-right"></i> 在线模考系统</a></li>
+                </ul>
+            </div>
+            
+            <div class="footer-section">
+                <h3>学习资源</h3>
+                <ul class="footer-links">
+                    <li><a href="#"><i class="fas fa-chevron-right"></i> 真题解析</a></li>
+                    <li><a href="#"><i class="fas fa-chevron-right"></i> 听力训练</a></li>
+                    <li><a href="#"><i class="fas fa-chevron-right"></i> 阅读技巧</a></li>
+                    <li><a href="#"><i class="fas fa-chevron-right"></i> 翻译突破</a></li>
+                </ul>
+            </div>
+            
+            <div class="footer-section">
+                <h3>联系我们</h3>
+                <ul class="footer-links">
+                    <li><a href="#"><i class="fas fa-envelope"></i> 客服邮箱</a></li>
+                    <li><a href="#"><i class="fab fa-weixin"></i> 官方微信</a></li>
+                    <li><a href="#"><i class="fab fa-qq"></i> QQ交流群</a></li>
+                    <li><a href="#"><i class="fas fa-map-marker-alt"></i> 地址信息</a></li>
+                </ul>
+            </div>
+        </div>
+        
+        <div class="copyright">
+            <p>© 2023 大学英语四六级考试资源分享平台 版权所有 | 隐私政策 | 服务条款</p>
+        </div>
+    </footer>
+    
+    <script>
+        // 按钮动画效果（保留交互体验）
+        const buttons = document.querySelectorAll('.btn');
+        buttons.forEach(btn => {
+            btn.addEventListener('mouseover', function() {
+                this.style.transform = 'translateY(-5px)';
+            });
+            
+            btn.addEventListener('mouseout', function() {
+                this.style.transform = '';
+            });
+        });
+    </script>
+</body>
+</html>
