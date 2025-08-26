@@ -78,7 +78,7 @@ void http_conn::init(int sockfd, const sockaddr_in &addr,
     m_address= addr;
     addfd(m_epollfd,sockfd,true, trigmode);
     m_user_count++;
-    //cout<< "user count ++:" << m_user_count<<' '<< sockfd<< endl;
+    printf("debug:");
     LOG_INFO("client(%s) in, user count:%d", inet_ntoa(addr.sin_addr), m_user_count);
     doc_root=root;
     m_trigmode=trigmode;
@@ -232,11 +232,16 @@ void http_conn::initmysql_result(connection_pool *connPool)
     //MYSQL_FIELD *fields = mysql_fetch_fields(result);
 
     //从结果集中获取下一行，将对应的用户名和密码，存入map中
-    while (MYSQL_ROW row = mysql_fetch_row(result))
-    {
-        string temp1(row[0]);
-        string temp2(row[1]);
-        users[temp1] = temp2;
+    if (result) {  // 确保结果不为空
+        //从结果集中获取下一行，将对应的用户名和密码，存入map中
+        while (MYSQL_ROW row = mysql_fetch_row(result))
+        {
+            string temp1(row[0]);
+            string temp2(row[1]);
+            users[temp1] = temp2;
+        }
+        
+        mysql_free_result(result);  
     }
 }
 

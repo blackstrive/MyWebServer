@@ -278,6 +278,7 @@ void WebServer::deal_timer(util_timer *timer, int sockfd)
 bool WebServer::dealClientConn()
 {
     struct sockaddr_in client_address;
+    memset(&client_address, 0, sizeof(client_address)); 
     socklen_t client_addrlength = sizeof(client_address);
     if(0 == m_listen_trigmode)//LT
     {
@@ -306,18 +307,23 @@ bool WebServer::dealClientConn()
             int connfd=accept(m_listenfd,(struct sockaddr*)&client_address,&client_addrlength);
             if(connfd < 0)
             {
+                if(errno == EAGAIN || errno == EWOULDBLOCK) {
+                    // 没有更多连接了，这是正常情况
+                    break;
+                }
                 LOG_ERROR("%s:errno is:%d", "accept error", errno);
                 break;
             }
             if(http_conn::m_user_count >= MAX_FD)
             {
                 LOG_ERROR("%s", "Internal server busy");
+                // 这里应该关闭connfd以避免文件描述符泄露
+                close(connfd);
                 break;
             }
-            //users[connfd].init(connfd,client_address,m_root,m_conn_trigmode,m_close_log,m_user,m_passWord,m_databaseName);
             timer(connfd, client_address);
         }
-        return false;//?
+    return true; // 修改这里，应该返回true而不是false
     }
     return true;
 
