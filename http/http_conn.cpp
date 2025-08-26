@@ -14,7 +14,8 @@ const char *error_500_form = "There was an unusual problem serving the request f
 
 locker m_lock;
 map<string,string> users;
-
+int http_conn::m_epollfd=-1;
+int http_conn::m_user_count=0;
 int setnonblocking(int fd)
 {
     int old_option=fcntl(fd,F_GETFL);
@@ -66,9 +67,6 @@ void modfd(int epollfd,int fd,int ev,int TRIGMod)
     epoll_ctl(epollfd,EPOLL_CTL_MOD,fd,&event);
 }
 
-int http_conn::m_epollfd=-1;
-int http_conn::m_user_count=0;
-
 void http_conn::init(int sockfd, const sockaddr_in &addr, 
     char *root, int trigmode, int close_log, 
     std::string user, std::string password, 
@@ -78,11 +76,11 @@ void http_conn::init(int sockfd, const sockaddr_in &addr,
     m_address= addr;
     addfd(m_epollfd,sockfd,true, trigmode);
     m_user_count++;
-    printf("debug:");
+    m_close_log=close_log;
     LOG_INFO("client(%s) in, user count:%d", inet_ntoa(addr.sin_addr), m_user_count);
     doc_root=root;
     m_trigmode=trigmode;
-    m_close_log=close_log;
+
 
     strcpy(sql_user,user.c_str());
     strcpy(sql_password,password.c_str());

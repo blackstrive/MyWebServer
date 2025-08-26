@@ -1,149 +1,80 @@
 #include "lst_timer.h"
 #include "../http/http_conn.h"
+int m_close_log = 0;
+sort_timer::~sort_timer()
+{
+    while(!m_timer_que.empty())
+    {
+        util_timer *timer = m_timer_que.top();
+        m_timer_que.pop();
+        if(timer)
+        {
+            delete timer;
+            timer = NULL;
+        }
 
-sort_timer_lst::sort_timer_lst()
-{
-    head = NULL;
-    tail = NULL;
-}
-sort_timer_lst::~sort_timer_lst()
-{
-    util_timer *tmp = head;
-    while (tmp)
-    {
-        head = tmp->next;
-        delete tmp;
-        tmp = head;
     }
 }
 
-void sort_timer_lst::add_timer(util_timer *timer)
+void sort_timer::add_timer(util_timer *timer)
 {
-    if (!timer)
+    if(timer)
     {
-        return;
-    }
-    if (!head)
-    {
-        head = tail = timer;
-        return;
-    }
-    if (timer->expire < head->expire)
-    {
-        timer->next = head;
-        head->prev = timer;
-        head = timer;
-        return;
-    }
-    add_timer(timer, head);
-}
-void sort_timer_lst::adjust_timer(util_timer *timer)
-{
-    if (!timer)
-    {
-        return;
-    }
-    util_timer *tmp = timer->next;
-    if (!tmp || (timer->expire < tmp->expire))
-    {
-        return;
-    }
-    if (timer == head)
-    {
-        head = head->next;
-        head->prev = NULL;
-        timer->next = NULL;
-        add_timer(timer, head);
-    }
-    else
-    {
-        timer->prev->next = timer->next;
-        timer->next->prev = timer->prev;
-        add_timer(timer, timer->next);
+        m_timer_que.push(timer);
+        LOG_DEBUG("add timer once, sockfd = %d", timer->user_data->sockfd);
     }
 }
-void sort_timer_lst::del_timer(util_timer *timer)
+util_timer * sort_timer::adjust_timer(util_timer *timer)
 {
-    if (!timer)
+    if(timer)
     {
-        return;
-    }
-    if ((timer == head) && (timer == tail))
-    {
-        delete timer;
-        head = NULL;
-        tail = NULL;
-        return;
-    }
-    if (timer == head)
-    {
-        head = head->next;
-        head->prev = NULL;
-        delete timer;
-        return;
-    }
-    if (timer == tail)
-    {
-        tail = tail->prev;
-        tail->next = NULL;
-        delete timer;
-        return;
-    }
-    timer->prev->next = timer->next;
-    timer->next->prev = timer->prev;
-    delete timer;
+        util_timer* new_timer = new util_timer;
+        new_timer->expire = timer->expire;
+        new_timer->cb_func = timer->cb_func;
+        new_timer->user_data = timer->user_data;
+        new_timer->ischanged=false;
+        timer->ischanged=true;
+        m_timer_que.push(new_timer);
+        LOG_DEBUG("adjust timer once, sockfd = %d", timer->user_data->sockfd);
+        return new_timer;
+    }  
 }
-void sort_timer_lst::tick()
+void sort_timer::del_timer(util_timer *timer)
 {
-    if (!head)
+    if(timer)
     {
-        return;
+        LOG_DEBUG("delete timer once, sockfd = %d", timer->user_data->sockfd);
+        timer->expire=time(NULL);
     }
-    
+}
+void sort_timer::tick()
+{
     time_t cur = time(NULL);
-    util_timer *tmp = head;
-    while (tmp)
+    while(!m_timer_que.empty())
     {
-        if (cur < tmp->expire)
+        util_timer *timer = m_timer_que.top();
+        if(timer->ischanged)
+        {
+
+            m_timer_que.pop();
+            LOG_DEBUG("delete changed timer once, sockfd = %d", timer->user_data->sockfd);
+            delete timer;
+            timer = NULL;
+            continue;
+        }
+        if(timer->expire >cur)
         {
             break;
         }
-        tmp->cb_func(tmp->user_data);
-        head = tmp->next;
-        if (head)
-        {
-            head->prev = NULL;
-        }
-        delete tmp;
-        tmp = head;
+        timer->cb_func(timer->user_data);
+        m_timer_que.pop();
+        LOG_DEBUG("delete timer once, sockfd = %d", timer->user_data->sockfd);
+        delete timer;
+        timer = NULL;
     }
 }
 
-void sort_timer_lst::add_timer(util_timer *timer, util_timer *lst_head)
-{
-    util_timer *prev = lst_head;
-    util_timer *tmp = prev->next;
-    while (tmp)
-    {
-        if (timer->expire < tmp->expire)
-        {
-            prev->next = timer;
-            timer->next = tmp;
-            tmp->prev = timer;
-            timer->prev = prev;
-            break;
-        }
-        prev = tmp;
-        tmp = tmp->next;
-    }
-    if (!tmp)
-    {
-        prev->next = timer;
-        timer->prev = prev;
-        timer->next = NULL;
-        tail = timer;
-    }
-}
+
 
 void Utils::init(int timeslot)
 {
@@ -201,7 +132,7 @@ void Utils::addsig(int sig, void(handler)(int), bool restart)
 //定时处理任务，重新定时以不断触发SIGALRM信号
 void Utils::timer_handler()
 {
-    m_timer_lst.tick();
+    m_timer_que.tick();
     alarm(m_TIMESLOT);
 }
 
@@ -222,6 +153,5 @@ void cb_func(client_data *user_data)
     close(user_data->sockfd);
     http_conn::m_user_count--;
     //cout<<"user count --:"<<http_conn::m_user_count<<' '<<user_data->sockfd <<endl;
-    int m_close_log = 0;
     LOG_INFO("client(%s) quit, user count:%d", inet_ntoa(user_data->address.sin_addr), http_conn::m_user_count);
 }

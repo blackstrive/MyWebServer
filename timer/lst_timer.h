@@ -20,11 +20,13 @@
 #include <errno.h>
 #include <sys/wait.h>
 #include <sys/uio.h>
-
+#include<queue>
+#include<vector>
 #include <time.h>
 #include "../log/log.h"
 
 class util_timer;
+
 
 struct client_data
 {
@@ -36,33 +38,35 @@ struct client_data
 class util_timer
 {
 public:
-    util_timer() : prev(NULL), next(NULL) {}
+    util_timer(){}
 
 public:
     time_t expire;
-    
+    bool ischanged=false;
     void (* cb_func)(client_data *);
     client_data *user_data;
-    util_timer *prev;
-    util_timer *next;
 };
-
-class sort_timer_lst
+class comp_timer
 {
 public:
-    sort_timer_lst();
-    ~sort_timer_lst();
+    bool operator()(util_timer* a, util_timer* b)
+    {
+        return a->expire > b->expire;
+    }
+};
+class sort_timer
+{
+public:
+    sort_timer()=default;
+    ~sort_timer();
 
     void add_timer(util_timer *timer);
-    void adjust_timer(util_timer *timer);
+    util_timer * adjust_timer(util_timer *timer);
     void del_timer(util_timer *timer);
     void tick();
 
 private:
-    void add_timer(util_timer *timer, util_timer *lst_head);
-
-    util_timer *head;
-    util_timer *tail;
+    std::priority_queue<util_timer* ,std::vector<util_timer*> ,comp_timer> m_timer_que;
 };
 
 class Utils
@@ -92,7 +96,7 @@ public:
 
 public:
     static int *u_pipefd;
-    sort_timer_lst m_timer_lst;
+    sort_timer m_timer_que;
     static int u_epollfd;
     int m_TIMESLOT;
 };

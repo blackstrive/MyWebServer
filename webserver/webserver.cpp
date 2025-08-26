@@ -210,6 +210,7 @@ void WebServer::eventLoop()// to add ok
                 //服务器端关闭连接，移除对应的定时器
                 util_timer *timer = users_timer[sockfd].timer;
                 deal_timer(timer, sockfd);
+                users_timer[sockfd].timer = nullptr;
             }
             //处理信号
             else if ((sockfd == m_pipefd[0]) && (events[i].events & EPOLLIN))
@@ -253,25 +254,24 @@ void WebServer::timer(int connfd, sockaddr_in client_address)
     time_t cur = time(NULL);
     timer->expire = cur + 3 * TIMESLOT;
     users_timer[connfd].timer = timer;
-    utils.m_timer_lst.add_timer(timer);
+    utils.m_timer_que.add_timer(timer);
 }
 
-void WebServer::adjust_timer(util_timer *timer)
+util_timer* WebServer::adjust_timer(util_timer *timer)
 {
     time_t cur = time(NULL);
     timer->expire = cur + 3 * TIMESLOT;
-    utils.m_timer_lst.adjust_timer(timer);
-    LOG_INFO("%s", "adjust timer once");
+    util_timer* new_timer= utils.m_timer_que.adjust_timer(timer);
+    return new_timer;
 }
 
 void WebServer::deal_timer(util_timer *timer, int sockfd)
 {
-    timer->cb_func(&users_timer[sockfd]);
+    //timer->cb_func(&users_timer[sockfd]);
     if (timer)
     {
-        utils.m_timer_lst.del_timer(timer);
+        utils.m_timer_que.del_timer(timer);
     }
-    cout<<"close fd "<<users_timer[sockfd].sockfd<<endl;
     LOG_INFO("close fd %d", users_timer[sockfd].sockfd);
 }
 
@@ -374,7 +374,8 @@ void WebServer::dealRead(int sockfd)//to add ok
     {
         if (timer)
         {
-            adjust_timer(timer);
+            util_timer* new_timer = adjust_timer(timer);
+            users_timer[sockfd].timer= new_timer;
         }
 
         //若监测到读事件，将该事件放入请求队列
@@ -387,6 +388,7 @@ void WebServer::dealRead(int sockfd)//to add ok
                 if (1 == users[sockfd].timer_flag)
                 {
                     deal_timer(timer, sockfd);
+                    users_timer[sockfd].timer = nullptr;
                     users[sockfd].timer_flag = 0;
                 }
                 users[sockfd].improv = 0;
@@ -406,12 +408,14 @@ void WebServer::dealRead(int sockfd)//to add ok
 
             if (timer)
             {
-                adjust_timer(timer);
+                util_timer* new_timer = adjust_timer(timer);
+                users_timer[sockfd].timer= new_timer;
             }
         }
         else
         {
             deal_timer(timer, sockfd);
+            users_timer[sockfd].timer = nullptr;
         }
     }
 }
@@ -425,7 +429,9 @@ void WebServer::dealWrite(int sockfd)// to add ok
     {
         if (timer)
         {
-            adjust_timer(timer);
+           util_timer* new_timer = adjust_timer(timer);
+           users_timer[sockfd].timer= new_timer;
+
         }
 
         m_pool->append(users + sockfd, 1);
@@ -437,6 +443,7 @@ void WebServer::dealWrite(int sockfd)// to add ok
                 if (1 == users[sockfd].timer_flag)
                 {
                     deal_timer(timer, sockfd);
+                    users_timer[sockfd].timer = nullptr;
                     users[sockfd].timer_flag = 0;
                 }
                 users[sockfd].improv = 0;
@@ -453,12 +460,14 @@ void WebServer::dealWrite(int sockfd)// to add ok
 
             if (timer)
             {
-                adjust_timer(timer);
+                util_timer* new_timer = adjust_timer(timer);
+                users_timer[sockfd].timer= new_timer;
             }
         }
         else
         {
             deal_timer(timer, sockfd);
+            users_timer[sockfd].timer = nullptr;
         }
     }
 }
