@@ -45,14 +45,15 @@ public:
     void dealWrite(int sockfd);
 
 public:
-    int m_port; //服务器端口
-    char *m_root; 
-    int m_log_write;
-    int m_close_log;
-    int m_actormodel;
-    int m_pipefd[2];
-    int m_epollfd;
-    http_conn *users;
+    int m_port; //服务器端口             // 服务器端口号
+    char *m_root;             // 网站根目录路径
+    int m_log_write;          // 日志写入模式（0-同步，1-异步）
+    int m_close_log;          // 是否关闭日志（0-开启，1-关闭）
+    int m_actormodel;         // 模型选择（0-proactor，1-reactor）
+    int m_pipefd[2];          // 用于信号处理的socketpair
+    int m_epollfd;            // epoll实例的文件描述符
+    http_conn *users;         // 存储所有HTTP连接的数组（下标为文件描述符）
+   
 
     //datebase
     connection_pool *m_connPool;
