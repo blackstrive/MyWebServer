@@ -14,7 +14,7 @@ int main()
     string databasename="yourdb";
 
     char server_Path[100];
-    getcwd(server_Path, sizeof(server_Path));
+    getcwd(server_Path, sizeof(server_Path));//调用系统函数 getcwd (Get Current Working Directory) 来获取当前工作目录的绝对路径，并将其存入 server_Path 缓冲区。
     WebServer server(server_Path);
     server.init(9006,user,passwd,databasename,1,0,0,8,8,0,0);
 
